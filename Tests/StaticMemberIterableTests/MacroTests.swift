@@ -80,8 +80,8 @@ struct StaticMemberIterableTests {
 		let members = Coffee.allStaticMembers
 
 		#expect(members.count == 3)
-		#expect(members.map(\.name.rawValue) == ["sunrise", "moonlight", "stardust"])
-		#expect(members.map(\.name.title) == ["Sunrise", "Moonlight", "Stardust"])
+		#expect(members.map(\.name) == ["sunrise", "moonlight", "stardust"])
+		#expect(members.map(\.title) == ["Sunrise", "Moonlight", "Stardust"])
 		#expect(members.map(\.value.name) == ["sunrise", "moonlight", "stardust"])
 		#expect(members.map(\.value.roastLevel) == [2, 3, 4])
 
@@ -93,15 +93,15 @@ struct StaticMemberIterableTests {
 		let members = Menu.allStaticMembers
 
 		#expect(members.count == 2)
-		#expect(members.map(\.name.rawValue) == ["sunrise", "sunset"])
-		#expect(members.map(\.name.title) == ["Sunrise", "Sunset"])
+		#expect(members.map(\.name) == ["sunrise", "sunset"])
+		#expect(members.map(\.title) == ["Sunrise", "Sunset"])
 		#expect(members.map(\.value) == [Menu.sunrise, Menu.sunset])
 	}
 
 	@Test func customMemberTypeRuntime() {
 		let members = BeverageFixtures.allStaticMembers
 
-		#expect(members.map(\.name.rawValue) == ["sparkling", "still"])
+		#expect(members.map(\.name) == ["sparkling", "still"])
 		#expect(members.map(\.value) == [Beverage(name: "sparkling"), Beverage(name: "still")])
 	}
 
@@ -109,17 +109,17 @@ struct StaticMemberIterableTests {
 		let members = ExistentialBeverageFixtures.allStaticMembers
 
 		#expect(members.count == 2)
-		#expect(members.map(\.name.rawValue) == ["espresso", "latte"])
-		#expect(members.map(\.name.title) == ["Espresso", "Latte"])
-		#expect(members.map(\.value.name) == members.map(\.name.rawValue))
+		#expect(members.map(\.name) == ["espresso", "latte"])
+		#expect(members.map(\.title) == ["Espresso", "Latte"])
+		#expect(members.map(\.value.name) == members.map(\.name))
 	}
 
 	@Test func reservedIdentifiers() {
 		let members = ReservedNames.allStaticMembers
 
 		#expect(members.count == 2)
-		#expect(members.map(\.name.rawValue) == ["class", "plain"])
-		#expect(members.map(\.name.title) == ["Class", "Plain"])
+		#expect(members.map(\.name) == ["class", "plain"])
+		#expect(members.map(\.title) == ["Class", "Plain"])
 		#expect(members.map(\.value) == [ReservedNames.`class`, ReservedNames.plain])
 	}
 
@@ -127,8 +127,8 @@ struct StaticMemberIterableTests {
 		let members = Laboratory.allStaticMembers
 
 		#expect(members.count == 2)
-		#expect(members.map(\.name.rawValue) == ["alpha", "beta"])
-		#expect(members.map(\.name.title) == ["Alpha", "Beta"])
+		#expect(members.map(\.name) == ["alpha", "beta"])
+		#expect(members.map(\.title) == ["Alpha", "Beta"])
 		#expect(members.map(\.value) == [Laboratory.alpha, Laboratory.beta])
 	}
 
@@ -136,8 +136,8 @@ struct StaticMemberIterableTests {
 		let members = MockDrink.allStaticMembers
 
 		#expect(members.count == 2)
-		#expect(members.map(\.name.rawValue) == ["water", "soda"])
-		#expect(members.map(\.name.title) == ["Water", "Soda"])
+		#expect(members.map(\.name) == ["water", "soda"])
+		#expect(members.map(\.title) == ["Water", "Soda"])
 		#expect(members.map(\.value) == [MockDrink.water, MockDrink.soda])
 	}
 }

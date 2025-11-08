@@ -31,9 +31,9 @@ struct Coffee {
     static let stardust = Coffee(name: "stardust", roastLevel: 4)
 }
 
-Coffee.allStaticMembers.map(\.value)       // [sunrise, moonlight, stardust] as [Coffee]
-Coffee.allStaticMembers.map(\.name.title)  // ["Sunrise", "Moonlight", "Stardust"]
-Coffee.allStaticMembers.map(\.keyPath)     // [\Coffee.sunrise, ...] as [KeyPath<Coffee.Type, Coffee>]
+Coffee.allStaticMembers.map(\.value)   // [sunrise, moonlight, stardust] as [Coffee]
+Coffee.allStaticMembers.map(\.title)   // ["Sunrise", "Moonlight", "Stardust"]
+Coffee.allStaticMembers.map(\.keyPath) // [\Coffee.sunrise, ...] as [KeyPath<Coffee.Type, Coffee>]
 ```
 
 The macro works the same for enums and classes (actors are intentionally unsupported so far).
@@ -42,14 +42,15 @@ Each synthesized entry is a `StaticMember<Container, Value>`: an `Identifiable` 
 
 ```swift
 ForEach(Coffee.allStaticMembers) { member in
-    Text(member.name.title)
+    Text(member.title)
         .tag(member.keyPath)
 }
 ```
 
-`StaticMember` exposes three pieces of data:
+`StaticMember` exposes four pieces of data:
 
-- `name: StaticMemberName` – keeps the original identifier plus helpers like `.title`.
+- `name: String` – keeps the original identifier for the member.
+- `title: String` – human-friendly representation derived from the identifier.
 - `keyPath: KeyPath<Container.Type, Value>` – points back to the static property inside the declaring type.
 - `value`/`wrappedValue: Value` – the actual static instance.
 
