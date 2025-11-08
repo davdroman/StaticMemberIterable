@@ -28,7 +28,7 @@ struct StaticMemberIterableMacroTests {
 			}
 			"""
 		} expansion: {
-			"""
+			#"""
 			struct Coffee {
 				let name: String
 				let roastLevel: Int
@@ -37,17 +37,25 @@ struct StaticMemberIterableMacroTests {
 				static let moonlight = Coffee(name: "moonlight", roastLevel: 3)
 				static let stardust = Coffee(name: "stardust", roastLevel: 4)
 
-				static let allStaticMembers = [sunrise, moonlight, stardust]
-
-				static let allStaticMemberNames: [StaticMemberName] = ["sunrise", "moonlight", "stardust"]
-
-				static let allNamedStaticMembers: [(name: StaticMemberName, value: Self)] = [
-					(name: "sunrise", value: sunrise),
-					(name: "moonlight", value: moonlight),
-					(name: "stardust", value: stardust)
+				static let allStaticMembers: [StaticMember<Coffee, Coffee>] = [
+					StaticMember(
+						keyPath: \Coffee.Type .sunrise,
+						name: "sunrise",
+						value: sunrise
+					),
+					StaticMember(
+						keyPath: \Coffee.Type .moonlight,
+						name: "moonlight",
+						value: moonlight
+					),
+					StaticMember(
+						keyPath: \Coffee.Type .stardust,
+						name: "stardust",
+						value: stardust
+					)
 				]
 			}
-			"""
+			"""#
 		}
 	}
 
@@ -61,22 +69,30 @@ struct StaticMemberIterableMacroTests {
 			}
 			"""
 		} expansion: {
-			"""
+			#"""
 			struct Blend {
 				static let sunrise = Blend(), moonlight = Blend()
 				static let stardust = Blend()
 
-				static let allStaticMembers = [sunrise, moonlight, stardust]
-
-				static let allStaticMemberNames: [StaticMemberName] = ["sunrise", "moonlight", "stardust"]
-
-				static let allNamedStaticMembers: [(name: StaticMemberName, value: Self)] = [
-					(name: "sunrise", value: sunrise),
-					(name: "moonlight", value: moonlight),
-					(name: "stardust", value: stardust)
+				static let allStaticMembers: [StaticMember<Blend, Blend>] = [
+					StaticMember(
+						keyPath: \Blend.Type .sunrise,
+						name: "sunrise",
+						value: sunrise
+					),
+					StaticMember(
+						keyPath: \Blend.Type .moonlight,
+						name: "moonlight",
+						value: moonlight
+					),
+					StaticMember(
+						keyPath: \Blend.Type .stardust,
+						name: "stardust",
+						value: stardust
+					)
 				]
 			}
-			"""
+			"""#
 		}
 	}
 
@@ -91,22 +107,26 @@ struct StaticMemberIterableMacroTests {
 			}
 			"""
 		} expansion: {
-			"""
+			#"""
 			class Laboratory {
 				static let alpha = Laboratory()
 				static var placeholder = Laboratory()
 				static let beta = Laboratory()
 
-				static let allStaticMembers = [alpha, beta]
-
-				static let allStaticMemberNames: [StaticMemberName] = ["alpha", "beta"]
-
-				static let allNamedStaticMembers: [(name: StaticMemberName, value: Laboratory)] = [
-					(name: "alpha", value: alpha),
-					(name: "beta", value: beta)
+				static let allStaticMembers: [StaticMember<Laboratory, Laboratory>] = [
+					StaticMember(
+						keyPath: \Laboratory.Type .alpha,
+						name: "alpha",
+						value: alpha
+					),
+					StaticMember(
+						keyPath: \Laboratory.Type .beta,
+						name: "beta",
+						value: beta
+					)
 				]
 			}
-			"""
+			"""#
 		}
 	}
 
@@ -121,23 +141,31 @@ struct StaticMemberIterableMacroTests {
 			}
 			"""
 		} expansion: {
-			"""
+			#"""
 			enum ReservedNames {
 				static let `class` = ReservedNames()
 				static let `struct` = ReservedNames()
 				static let plain = ReservedNames()
 
-				static let allStaticMembers = [`class`, `struct`, plain]
-
-				static let allStaticMemberNames: [StaticMemberName] = ["class", "struct", "plain"]
-
-				static let allNamedStaticMembers: [(name: StaticMemberName, value: Self)] = [
-					(name: "class", value: `class`),
-					(name: "struct", value: `struct`),
-					(name: "plain", value: plain)
+				static let allStaticMembers: [StaticMember<ReservedNames, ReservedNames>] = [
+					StaticMember(
+						keyPath: \ReservedNames.Type .`class`,
+						name: "class",
+						value: `class`
+					),
+					StaticMember(
+						keyPath: \ReservedNames.Type .`struct`,
+						name: "struct",
+						value: `struct`
+					),
+					StaticMember(
+						keyPath: \ReservedNames.Type .plain,
+						name: "plain",
+						value: plain
+					)
 				]
 			}
-			"""
+			"""#
 		}
 	}
 
@@ -154,25 +182,33 @@ struct StaticMemberIterableMacroTests {
 			}
 			"""
 		} expansion: {
-			"""
+			#"""
 			struct MyRecord {
 				enum Fixtures {
 					static let a = MyRecord()
 					static let b = MyRecord()
 					static let c = MyRecord()
 
-					fileprivate static let allStaticMembers = [a, b, c]
-
-					fileprivate static let allStaticMemberNames: [StaticMemberName] = ["a", "b", "c"]
-
-					fileprivate static let allNamedStaticMembers: [(name: StaticMemberName, value: Self)] = [
-						(name: "a", value: a),
-						(name: "b", value: b),
-						(name: "c", value: c)
+					fileprivate static let allStaticMembers: [StaticMember<Fixtures, Fixtures>] = [
+						StaticMember(
+							keyPath: \Fixtures.Type .a,
+							name: "a",
+							value: a
+						),
+						StaticMember(
+							keyPath: \Fixtures.Type .b,
+							name: "b",
+							value: b
+						),
+						StaticMember(
+							keyPath: \Fixtures.Type .c,
+							name: "c",
+							value: c
+						)
 					]
 				}
 			}
-			"""
+			"""#
 		}
 	}
 
@@ -188,22 +224,26 @@ struct StaticMemberIterableMacroTests {
 			}
 			"""
 		} expansion: {
-			"""
+			#"""
 			class Drink {}
 			class MockDrink: Drink {
 				static let water = MockDrink()
 				static let soda = MockDrink()
 
-				static let allStaticMembers = [water, soda]
-
-				static let allStaticMemberNames: [StaticMemberName] = ["water", "soda"]
-
-				static let allNamedStaticMembers: [(name: StaticMemberName, value: MockDrink)] = [
-					(name: "water", value: water),
-					(name: "soda", value: soda)
+				static let allStaticMembers: [StaticMember<MockDrink, MockDrink>] = [
+					StaticMember(
+						keyPath: \MockDrink.Type .water,
+						name: "water",
+						value: water
+					),
+					StaticMember(
+						keyPath: \MockDrink.Type .soda,
+						name: "soda",
+						value: soda
+					)
 				]
 			}
-			"""
+			"""#
 		}
 	}
 
@@ -219,22 +259,26 @@ struct StaticMemberIterableMacroTests {
 			}
 			"""
 		} expansion: {
-			"""
+			#"""
 			struct Drink {}
 			enum DrinkFixtures {
 				static let water = Drink()
 				static let soda = Drink()
 
-				static let allStaticMembers = [water, soda]
-
-				static let allStaticMemberNames: [StaticMemberName] = ["water", "soda"]
-
-				static let allNamedStaticMembers: [(name: StaticMemberName, value: Drink)] = [
-					(name: "water", value: water),
-					(name: "soda", value: soda)
+				static let allStaticMembers: [StaticMember<DrinkFixtures, Drink>] = [
+					StaticMember(
+						keyPath: \DrinkFixtures.Type .water,
+						name: "water",
+						value: water
+					),
+					StaticMember(
+						keyPath: \DrinkFixtures.Type .soda,
+						name: "soda",
+						value: soda
+					)
 				]
 			}
-			"""
+			"""#
 		}
 	}
 
@@ -251,23 +295,27 @@ struct StaticMemberIterableMacroTests {
 			}
 			"""
 		} expansion: {
-			"""
+			#"""
 			protocol Beverage {}
 			struct Coffee: Beverage {}
 			enum BeverageFixtures {
 				static let espresso = Coffee()
 				static let latte = Coffee()
 
-				static let allStaticMembers = [espresso, latte]
-
-				static let allStaticMemberNames: [StaticMemberName] = ["espresso", "latte"]
-
-				static let allNamedStaticMembers: [(name: StaticMemberName, value: (any Beverage))] = [
-					(name: "espresso", value: espresso),
-					(name: "latte", value: latte)
+				static let allStaticMembers: [StaticMember<BeverageFixtures, (any Beverage)>] = [
+					StaticMember(
+						keyPath: \BeverageFixtures.Type .espresso,
+						name: "espresso",
+						value: espresso
+					),
+					StaticMember(
+						keyPath: \BeverageFixtures.Type .latte,
+						name: "latte",
+						value: latte
+					)
 				]
 			}
-			"""
+			"""#
 		}
 	}
 
@@ -285,22 +333,26 @@ struct StaticMemberIterableMacroTests {
 			}
 			"""
 		} expansion: {
-			"""
+			#"""
 			struct Beverage {}
 			enum Menu {
 				static let espresso = Beverage()
 				static let latte = Beverage()
 
-				public static let allStaticMembers = [espresso, latte]
-
-				public static let allStaticMemberNames: [StaticMemberName] = ["espresso", "latte"]
-
-				public static let allNamedStaticMembers: [(name: StaticMemberName, value: Beverage)] = [
-					(name: "espresso", value: espresso),
-					(name: "latte", value: latte)
+				public static let allStaticMembers: [StaticMember<Menu, Beverage>] = [
+					StaticMember(
+						keyPath: \Menu.Type .espresso,
+						name: "espresso",
+						value: espresso
+					),
+					StaticMember(
+						keyPath: \Menu.Type .latte,
+						name: "latte",
+						value: latte
+					)
 				]
 			}
-			"""
+			"""#
 		}
 	}
 
@@ -314,21 +366,25 @@ struct StaticMemberIterableMacroTests {
 			}
 			"""
 		} expansion: {
-			"""
+			#"""
 			struct Roast {
 				static let light = Roast()
 				static let dark = Roast()
 
-				package static let allStaticMembers = [light, dark]
-
-				package static let allStaticMemberNames: [StaticMemberName] = ["light", "dark"]
-
-				package static let allNamedStaticMembers: [(name: StaticMemberName, value: Self)] = [
-					(name: "light", value: light),
-					(name: "dark", value: dark)
+				package static let allStaticMembers: [StaticMember<Roast, Roast>] = [
+					StaticMember(
+						keyPath: \Roast.Type .light,
+						name: "light",
+						value: light
+					),
+					StaticMember(
+						keyPath: \Roast.Type .dark,
+						name: "dark",
+						value: dark
+					)
 				]
 			}
-			"""
+			"""#
 		}
 	}
 
@@ -342,21 +398,25 @@ struct StaticMemberIterableMacroTests {
 			}
 			"""
 		} expansion: {
-			"""
+			#"""
 			enum MenuItem {
 				static let breakfast = MenuItem()
 				static let dinner = MenuItem()
 
-				private static let allStaticMembers = [breakfast, dinner]
-
-				private static let allStaticMemberNames: [StaticMemberName] = ["breakfast", "dinner"]
-
-				private static let allNamedStaticMembers: [(name: StaticMemberName, value: Self)] = [
-					(name: "breakfast", value: breakfast),
-					(name: "dinner", value: dinner)
+				private static let allStaticMembers: [StaticMember<MenuItem, MenuItem>] = [
+					StaticMember(
+						keyPath: \MenuItem.Type .breakfast,
+						name: "breakfast",
+						value: breakfast
+					),
+					StaticMember(
+						keyPath: \MenuItem.Type .dinner,
+						name: "dinner",
+						value: dinner
+					)
 				]
 			}
-			"""
+			"""#
 		}
 	}
 
@@ -409,7 +469,7 @@ struct StaticMemberIterableMacroTests {
 			"""
 			@StaticMemberIterable
 			struct Fixtures {
-				static let allStaticMembers: [Fixtures] = []
+				static let allStaticMembers = []
 				static let sunrise = Fixtures()
 			}
 			"""
@@ -419,7 +479,7 @@ struct StaticMemberIterableMacroTests {
 			┬────────────────────
 			╰─ 🛑 '@StaticMemberIterable' cannot generate 'allStaticMembers' because it already exists
 			struct Fixtures {
-				static let allStaticMembers: [Fixtures] = []
+				static let allStaticMembers = []
 				static let sunrise = Fixtures()
 			}
 			"""

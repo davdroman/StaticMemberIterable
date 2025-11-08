@@ -31,14 +31,29 @@ struct Coffee {
     static let stardust = Coffee(name: "stardust", roastLevel: 4)
 }
 
-Coffee.allStaticMembers       // [sunrise, moonlight, stardust]
-Coffee.allStaticMemberNames   // ["sunrise", "moonlight", "stardust"] as [StaticMemberName]
-Coffee.allNamedStaticMembers  // [(name: "sunrise", value: sunrise), ...] as [(name: StaticMemberName, value: Coffee)]
-
-Coffee.allStaticMemberNames.map(\.title) // ["Sunrise", "Moonlight", "Stardust"]
+Coffee.allStaticMembers.map(\.value)       // [sunrise, moonlight, stardust] as [Coffee]
+Coffee.allStaticMembers.map(\.name.title)  // ["Sunrise", "Moonlight", "Stardust"]
+Coffee.allStaticMembers.map(\.keyPath)     // [\Coffee.sunrise, ...] as [KeyPath<Coffee.Type, Coffee>]
 ```
 
 The macro works the same for enums and classes (actors are intentionally unsupported so far).
+
+Each synthesized entry is a `StaticMember<Container, Value>`: an `Identifiable` property wrapper that stores the friendly name, the `KeyPath` to the static property, and the concrete value. This makes it trivial to drive UI:
+
+```swift
+ForEach(Coffee.allStaticMembers) { member in
+    Text(member.name.title)
+        .tag(member.keyPath)
+}
+```
+
+`StaticMember` exposes three pieces of data:
+
+- `name: StaticMemberName` – keeps the original identifier plus helpers like `.title`.
+- `keyPath: KeyPath<Container.Type, Value>` – points back to the static property inside the declaring type.
+- `value`/`wrappedValue: Value` – the actual static instance.
+
+Because it is a property wrapper, you can also project (`$member`) when you use it on your own properties, and `Identifiable` conformance makes it slot neatly into `ForEach`.
 
 ### Access control
 
@@ -68,3 +83,5 @@ enum BeverageFixtures {
     static let still = Beverage(name: "Still")
 }
 ```
+
+Make sure the static members are declared so they can be assigned to the requested `ofType:` (e.g. annotate them as `Beverage` or `any Protocol`) so the synthesized key paths type-check.
