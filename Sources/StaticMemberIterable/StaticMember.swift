@@ -21,6 +21,10 @@ public struct StaticMember<Container, Value>: Identifiable {
 	public init(projectedValue: Self) {
 		self.init(keyPath: projectedValue.keyPath, name: projectedValue.name, value: projectedValue.value)
 	}
+
+	public static func ~= (keyPath: ID, staticMember: StaticMember) -> Bool {
+		staticMember.keyPath == keyPath
+	}
 }
 
 extension StaticMember: @unchecked Sendable where Value: Sendable {}
