@@ -1,5 +1,7 @@
 import Foundation
 
+public typealias StaticMemberOf<Container> = StaticMember<Container, Container>
+
 @propertyWrapper
 public struct StaticMember<Container, Value>: Identifiable {
 	public typealias ID = KeyPath<Container.Type, Value>
