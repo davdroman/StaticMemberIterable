@@ -152,7 +152,7 @@ struct StaticMemberEmitter {
 
 		let typealiasDecl: DeclSyntax =
 			"""
-			typealias StaticMemberValue = \(raw: valueType)
+			\(raw: access.prefix)typealias StaticMemberValue = \(raw: valueType)
 			"""
 
 		let membersDecl: DeclSyntax =

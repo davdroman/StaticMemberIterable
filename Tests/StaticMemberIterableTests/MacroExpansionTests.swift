@@ -197,7 +197,7 @@ struct StaticMemberIterableMacroTests {
 					static let b = MyRecord()
 					static let c = MyRecord()
 
-					typealias StaticMemberValue = Fixtures
+					fileprivate typealias StaticMemberValue = Fixtures
 
 					fileprivate static let allStaticMembers: [StaticMember<Fixtures, Fixtures>] = [
 						StaticMember(
@@ -355,7 +355,7 @@ struct StaticMemberIterableMacroTests {
 				static let espresso = Beverage()
 				static let latte = Beverage()
 
-				typealias StaticMemberValue = Beverage
+				public typealias StaticMemberValue = Beverage
 
 				public static let allStaticMembers: [StaticMember<Menu, Beverage>] = [
 					StaticMember(
@@ -389,7 +389,7 @@ struct StaticMemberIterableMacroTests {
 				static let light = Roast()
 				static let dark = Roast()
 
-				typealias StaticMemberValue = Roast
+				package typealias StaticMemberValue = Roast
 
 				package static let allStaticMembers: [StaticMember<Roast, Roast>] = [
 					StaticMember(
@@ -423,7 +423,7 @@ struct StaticMemberIterableMacroTests {
 				static let breakfast = MenuItem()
 				static let dinner = MenuItem()
 
-				typealias StaticMemberValue = MenuItem
+				private typealias StaticMemberValue = MenuItem
 
 				private static let allStaticMembers: [StaticMember<MenuItem, MenuItem>] = [
 					StaticMember(
