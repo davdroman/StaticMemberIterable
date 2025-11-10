@@ -337,270 +337,79 @@ struct StaticMemberIterableMacroTests {
 
 	// MARK: Access control
 
-	@Test func publicTypePropagatesAliasAccess() {
+	@Test(arguments: [
+		("public", "public"),
+		("internal", "internal"),
+		("", "internal"),
+		("package", "package"),
+		("fileprivate", "fileprivate"),
+		("private", "private"),
+	])
+	func typealiasPropagatesTypeAccess(typeAccess: String, expectedSemantic: String) {
+		let keywordPrefix = typeAccess.isEmpty ? "" : "\(typeAccess) "
+		let aliasPrefix = typeAccess.isEmpty ? "" : "\(expectedSemantic) "
+
 		assertMacro {
 			"""
 			@StaticMemberIterable
-			public struct Showcase {
-				public static let demo = Showcase()
+			\(keywordPrefix)struct AccessAliasFixture {
+				static let sample = AccessAliasFixture()
 			}
 			"""
 		} expansion: {
-			#"""
-			public struct Showcase {
-				public static let demo = Showcase()
+			"""
+			\(keywordPrefix)struct AccessAliasFixture {
+				static let sample = AccessAliasFixture()
 
-				public typealias StaticMemberValue = Showcase
+				\(aliasPrefix)typealias StaticMemberValue = AccessAliasFixture
 
-				static let allStaticMembers: [StaticMember<Showcase, Showcase>] = [
+				static let allStaticMembers: [StaticMember<AccessAliasFixture, AccessAliasFixture>] = [
 					StaticMember(
-						keyPath: \Showcase.Type .demo,
-						name: "demo",
-						value: demo
+						keyPath: \\AccessAliasFixture.Type .sample,
+						name: "sample",
+						value: sample
 					)
 				]
 			}
-			"""#
+			"""
 		}
 	}
 
-	@Test func implicitInternalTypePropagatesAliasAccess() {
+	@Test(arguments: [
+		("public", "public"),
+		("internal", "internal"),
+		("", "internal"),
+		("package", "package"),
+		("fileprivate", "fileprivate"),
+		("private", "private"),
+	])
+	func macroAccessSetsAllStaticMembers(macroAccess: String, expectedSemantic: String) {
+		let attribute = macroAccess.isEmpty ? "@StaticMemberIterable" : "@StaticMemberIterable(.\(macroAccess))"
+		let membersPrefix = macroAccess.isEmpty ? "" : "\(expectedSemantic) "
+
 		assertMacro {
 			"""
-			@StaticMemberIterable
-			struct InternalMenu {
-				static let breakfast = InternalMenu()
+			\(attribute)
+			struct AccessMacroFixture {
+				static let sample = AccessMacroFixture()
 			}
 			"""
 		} expansion: {
-			#"""
-			struct InternalMenu {
-				static let breakfast = InternalMenu()
+			"""
+			struct AccessMacroFixture {
+				static let sample = AccessMacroFixture()
 
-				typealias StaticMemberValue = InternalMenu
+				typealias StaticMemberValue = AccessMacroFixture
 
-				static let allStaticMembers: [StaticMember<InternalMenu, InternalMenu>] = [
+				\(membersPrefix)static let allStaticMembers: [StaticMember<AccessMacroFixture, AccessMacroFixture>] = [
 					StaticMember(
-						keyPath: \InternalMenu.Type .breakfast,
-						name: "breakfast",
-						value: breakfast
+						keyPath: \\AccessMacroFixture.Type .sample,
+						name: "sample",
+						value: sample
 					)
 				]
 			}
-			"""#
-		}
-	}
-
-	@Test func explicitInternalTypePropagatesAliasAccess() {
-		assertMacro {
 			"""
-			@StaticMemberIterable
-			internal struct ExplicitInternalMenu {
-				static let dinner = ExplicitInternalMenu()
-			}
-			"""
-		} expansion: {
-			#"""
-			internal struct ExplicitInternalMenu {
-				static let dinner = ExplicitInternalMenu()
-
-				internal typealias StaticMemberValue = ExplicitInternalMenu
-
-				static let allStaticMembers: [StaticMember<ExplicitInternalMenu, ExplicitInternalMenu>] = [
-					StaticMember(
-						keyPath: \ExplicitInternalMenu.Type .dinner,
-						name: "dinner",
-						value: dinner
-					)
-				]
-			}
-			"""#
-		}
-	}
-
-	@Test func packageTypePropagatesAliasAccess() {
-		assertMacro {
-			"""
-			@StaticMemberIterable
-			package struct PackageMenu {
-				static let special = PackageMenu()
-			}
-			"""
-		} expansion: {
-			#"""
-			package struct PackageMenu {
-				static let special = PackageMenu()
-
-				package typealias StaticMemberValue = PackageMenu
-
-				static let allStaticMembers: [StaticMember<PackageMenu, PackageMenu>] = [
-					StaticMember(
-						keyPath: \PackageMenu.Type .special,
-						name: "special",
-						value: special
-					)
-				]
-			}
-			"""#
-		}
-	}
-
-	@Test func fileprivateTypePropagatesAliasAccess() {
-		assertMacro {
-			"""
-			@StaticMemberIterable
-			fileprivate enum FileprivateMenu {
-				static let hidden = FileprivateMenu()
-			}
-			"""
-		} expansion: {
-			#"""
-			fileprivate enum FileprivateMenu {
-				static let hidden = FileprivateMenu()
-
-				fileprivate typealias StaticMemberValue = FileprivateMenu
-
-				static let allStaticMembers: [StaticMember<FileprivateMenu, FileprivateMenu>] = [
-					StaticMember(
-						keyPath: \FileprivateMenu.Type .hidden,
-						name: "hidden",
-						value: hidden
-					)
-				]
-			}
-			"""#
-		}
-	}
-
-	@Test func privateTypePropagatesAliasAccess() {
-		assertMacro {
-			"""
-			@StaticMemberIterable
-			private enum SecretMenu {
-				static let chef = SecretMenu()
-			}
-			"""
-		} expansion: {
-			#"""
-			private enum SecretMenu {
-				static let chef = SecretMenu()
-
-				private typealias StaticMemberValue = SecretMenu
-
-				static let allStaticMembers: [StaticMember<SecretMenu, SecretMenu>] = [
-					StaticMember(
-						keyPath: \SecretMenu.Type .chef,
-						name: "chef",
-						value: chef
-					)
-				]
-			}
-			"""#
-		}
-	}
-
-	@Test func publicAccess() {
-		assertMacro {
-			"""
-			struct Beverage {}
-
-			@StaticMemberIterable(.public, ofType: Beverage.self)
-			enum Menu {
-				static let espresso = Beverage()
-				static let latte = Beverage()
-			}
-			"""
-		} expansion: {
-			#"""
-			struct Beverage {}
-			enum Menu {
-				static let espresso = Beverage()
-				static let latte = Beverage()
-
-				typealias StaticMemberValue = Beverage
-
-				public static let allStaticMembers: [StaticMember<Menu, Beverage>] = [
-					StaticMember(
-						keyPath: \Menu.Type .espresso,
-						name: "espresso",
-						value: espresso
-					),
-					StaticMember(
-						keyPath: \Menu.Type .latte,
-						name: "latte",
-						value: latte
-					)
-				]
-			}
-			"""#
-		}
-	}
-
-	@Test func packageAccess() {
-		assertMacro {
-			"""
-			@StaticMemberIterable(.package)
-			struct Roast {
-				static let light = Roast()
-				static let dark = Roast()
-			}
-			"""
-		} expansion: {
-			#"""
-			struct Roast {
-				static let light = Roast()
-				static let dark = Roast()
-
-				typealias StaticMemberValue = Roast
-
-				package static let allStaticMembers: [StaticMember<Roast, Roast>] = [
-					StaticMember(
-						keyPath: \Roast.Type .light,
-						name: "light",
-						value: light
-					),
-					StaticMember(
-						keyPath: \Roast.Type .dark,
-						name: "dark",
-						value: dark
-					)
-				]
-			}
-			"""#
-		}
-	}
-
-	@Test func privateAccess() {
-		assertMacro {
-			"""
-			@StaticMemberIterable(.private)
-			enum MenuItem {
-				static let breakfast = MenuItem()
-				static let dinner = MenuItem()
-			}
-			"""
-		} expansion: {
-			#"""
-			enum MenuItem {
-				static let breakfast = MenuItem()
-				static let dinner = MenuItem()
-
-				typealias StaticMemberValue = MenuItem
-
-				private static let allStaticMembers: [StaticMember<MenuItem, MenuItem>] = [
-					StaticMember(
-						keyPath: \MenuItem.Type .breakfast,
-						name: "breakfast",
-						value: breakfast
-					),
-					StaticMember(
-						keyPath: \MenuItem.Type .dinner,
-						name: "dinner",
-						value: dinner
-					)
-				]
-			}
-			"""#
 		}
 	}
 
