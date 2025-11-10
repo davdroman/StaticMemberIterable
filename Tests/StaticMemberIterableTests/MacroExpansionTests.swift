@@ -37,6 +37,8 @@ struct StaticMemberIterableMacroTests {
 				static let moonlight = Coffee(name: "moonlight", roastLevel: 3)
 				static let stardust = Coffee(name: "stardust", roastLevel: 4)
 
+				typealias StaticMemberValue = Coffee
+
 				static let allStaticMembers: [StaticMember<Coffee, Coffee>] = [
 					StaticMember(
 						keyPath: \Coffee.Type .sunrise,
@@ -73,6 +75,8 @@ struct StaticMemberIterableMacroTests {
 			struct Blend {
 				static let sunrise = Blend(), moonlight = Blend()
 				static let stardust = Blend()
+
+				typealias StaticMemberValue = Blend
 
 				static let allStaticMembers: [StaticMember<Blend, Blend>] = [
 					StaticMember(
@@ -113,6 +117,8 @@ struct StaticMemberIterableMacroTests {
 				static var placeholder = Laboratory()
 				static let beta = Laboratory()
 
+				typealias StaticMemberValue = Laboratory
+
 				static let allStaticMembers: [StaticMember<Laboratory, Laboratory>] = [
 					StaticMember(
 						keyPath: \Laboratory.Type .alpha,
@@ -146,6 +152,8 @@ struct StaticMemberIterableMacroTests {
 				static let `class` = ReservedNames()
 				static let `struct` = ReservedNames()
 				static let plain = ReservedNames()
+
+				typealias StaticMemberValue = ReservedNames
 
 				static let allStaticMembers: [StaticMember<ReservedNames, ReservedNames>] = [
 					StaticMember(
@@ -189,6 +197,8 @@ struct StaticMemberIterableMacroTests {
 					static let b = MyRecord()
 					static let c = MyRecord()
 
+					typealias StaticMemberValue = Fixtures
+
 					fileprivate static let allStaticMembers: [StaticMember<Fixtures, Fixtures>] = [
 						StaticMember(
 							keyPath: \Fixtures.Type .a,
@@ -230,6 +240,8 @@ struct StaticMemberIterableMacroTests {
 				static let water = MockDrink()
 				static let soda = MockDrink()
 
+				typealias StaticMemberValue = MockDrink
+
 				static let allStaticMembers: [StaticMember<MockDrink, MockDrink>] = [
 					StaticMember(
 						keyPath: \MockDrink.Type .water,
@@ -264,6 +276,8 @@ struct StaticMemberIterableMacroTests {
 			enum DrinkFixtures {
 				static let water = Drink()
 				static let soda = Drink()
+
+				typealias StaticMemberValue = Drink
 
 				static let allStaticMembers: [StaticMember<DrinkFixtures, Drink>] = [
 					StaticMember(
@@ -302,6 +316,8 @@ struct StaticMemberIterableMacroTests {
 				static let espresso = Coffee()
 				static let latte = Coffee()
 
+				typealias StaticMemberValue = (any Beverage)
+
 				static let allStaticMembers: [StaticMember<BeverageFixtures, (any Beverage)>] = [
 					StaticMember(
 						keyPath: \BeverageFixtures.Type .espresso,
@@ -339,6 +355,8 @@ struct StaticMemberIterableMacroTests {
 				static let espresso = Beverage()
 				static let latte = Beverage()
 
+				typealias StaticMemberValue = Beverage
+
 				public static let allStaticMembers: [StaticMember<Menu, Beverage>] = [
 					StaticMember(
 						keyPath: \Menu.Type .espresso,
@@ -371,6 +389,8 @@ struct StaticMemberIterableMacroTests {
 				static let light = Roast()
 				static let dark = Roast()
 
+				typealias StaticMemberValue = Roast
+
 				package static let allStaticMembers: [StaticMember<Roast, Roast>] = [
 					StaticMember(
 						keyPath: \Roast.Type .light,
@@ -402,6 +422,8 @@ struct StaticMemberIterableMacroTests {
 			enum MenuItem {
 				static let breakfast = MenuItem()
 				static let dinner = MenuItem()
+
+				typealias StaticMemberValue = MenuItem
 
 				private static let allStaticMembers: [StaticMember<MenuItem, MenuItem>] = [
 					StaticMember(

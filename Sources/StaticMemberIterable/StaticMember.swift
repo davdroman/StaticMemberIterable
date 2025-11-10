@@ -1,6 +1,6 @@
 import Foundation
 
-public typealias StaticMemberOf<Container> = StaticMember<Container, Container>
+public typealias StaticMemberOf<Container: StaticMemberIterable> = StaticMember<Container, Container.StaticMemberValue>
 
 @propertyWrapper
 public struct StaticMember<Container, Value>: Identifiable {

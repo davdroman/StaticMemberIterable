@@ -1,6 +1,14 @@
+public protocol StaticMemberIterable {
+	associatedtype StaticMemberValue
+}
+
 @attached(
 	member,
-	names: named(allStaticMembers), named(allStaticMemberNames), named(allNamedStaticMembers)
+	names: named(StaticMemberValue), named(allStaticMembers)
+)
+@attached(
+	extension,
+	conformances: StaticMemberIterable
 )
 public macro StaticMemberIterable(
 	_ access: StaticMemberIterableAccess? = nil,

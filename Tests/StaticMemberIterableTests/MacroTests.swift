@@ -140,4 +140,12 @@ struct StaticMemberIterableTests {
 		#expect(members.map(\.title) == ["Water", "Soda"])
 		#expect(members.map(\.value) == [MockDrink.water, MockDrink.soda])
 	}
+
+	@Test func staticMemberIterableConformance() {
+		let coffeeMembers: [StaticMemberOf<Coffee>] = Coffee.allStaticMembers
+		let beverageMembers: [StaticMemberOf<BeverageFixtures>] = BeverageFixtures.allStaticMembers
+
+		#expect(coffeeMembers.count == 3)
+		#expect(beverageMembers.map(\.value.name) == ["sparkling", "still"])
+	}
 }

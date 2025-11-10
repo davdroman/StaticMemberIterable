@@ -51,6 +51,46 @@ struct StaticMemberIterableMacro: MemberMacro {
 	}
 }
 
+extension StaticMemberIterableMacro: ExtensionMacro {
+	static func expansion(
+		of node: AttributeSyntax,
+		attachedTo declaration: some DeclGroupSyntax,
+		providingExtensionsOf type: some TypeSyntaxProtocol,
+		conformingTo protocols: [TypeSyntax],
+		in context: some MacroExpansionContext
+	) throws -> [ExtensionDeclSyntax] {
+		if protocols.isEmpty {
+			return []
+		}
+
+		guard declaration.isSupportedType else {
+			throw DiagnosticsError(
+				diagnostics: [
+					Diagnostic(node: Syntax(node), message: NotATypeError()),
+				]
+			)
+		}
+
+		let wantsStaticMemberIterable = protocols.contains {
+			$0.trimmedDescription == "StaticMemberIterable"
+		}
+
+		guard wantsStaticMemberIterable else {
+			return []
+		}
+
+		let extendedType = type.trimmedDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+		let extensionDecl: DeclSyntax =
+			"""
+			extension \(raw: extendedType): StaticMemberIterable {}
+			"""
+
+		return [
+			extensionDecl.cast(ExtensionDeclSyntax.self)
+		]
+	}
+}
+
 // MARK: Diagnostics
 
 struct NotATypeError: DiagnosticMessage {
@@ -100,6 +140,7 @@ struct StaticMemberEmitter {
 	let valueType: String
 
 	static let synthesizedMemberNames = [
+		"StaticMemberValue",
 		"allStaticMembers",
 	]
 
@@ -109,12 +150,21 @@ struct StaticMemberEmitter {
 			.map { $0.initializer(containerType: sanitizedContainerType) }
 			.joined(separator: ",\n")
 
-		return [
+		let typealiasDecl: DeclSyntax =
+			"""
+			typealias StaticMemberValue = \(raw: valueType)
+			"""
+
+		let membersDecl: DeclSyntax =
 			"""
 			\(raw: access.prefix)static let allStaticMembers: [StaticMember<\(raw: containerType), \(raw: valueType)>] = [
 			\(raw: entries)
 			]
-			""",
+			"""
+
+		return [
+			typealiasDecl,
+			membersDecl,
 		]
 	}
 }
