@@ -76,6 +76,8 @@ let package = Package(
 				"CaseIterable",
 				"CaseIterableMacro",
 				.product(name: "MacroTesting", package: "swift-macro-testing"),
+				// For some reason, with Swift Syntax prebuilts enabled, we need to depend on SwiftCompilerPlugin here to work around error:
+				// Compilation search paths unable to resolve module dependency: 'SwiftCompilerPlugin'
 				.product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
 			]
 		),
