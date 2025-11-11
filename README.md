@@ -39,7 +39,7 @@ enum ColorPalette {
     static let stardust: Color = Color(red: 0.68, green: 0.51, blue: 0.78)
 }
 
-ColorPalette.allStaticMembers.map(\.value)   // [.orange, .indigo, .purple] as [Color]
+ColorPalette.allStaticMembers.map(\.value)   // [Color(red: 1.00, ...), ...]
 ColorPalette.allStaticMembers.map(\.title)   // ["Sunrise", "Moonlight", "Stardust"]
 ColorPalette.allStaticMembers.map(\.keyPath) // [\ColorPalette.sunrise, ...] as [KeyPath<ColorPalette.Type, Color>]
 ```

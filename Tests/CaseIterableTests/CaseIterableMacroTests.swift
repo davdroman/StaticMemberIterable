@@ -1,5 +1,6 @@
 #if canImport(CaseIterableMacro)
 import MacroTesting
+import SwiftSyntax
 import Testing
 
 @testable import CaseIterableMacro
@@ -7,8 +8,7 @@ import Testing
 @Suite(
 	.macros(
 		[CaseIterableMacro.self],
-		indentationWidth: .tab,
-		record: .missing
+		indentationWidth: .tab
 	)
 )
 struct CaseIterableMacroTests {
