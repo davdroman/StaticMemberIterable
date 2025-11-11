@@ -41,8 +41,8 @@ Each synthesized entry is a `StaticMember<Container, Value>`: an `Identifiable` 
 ```swift
 ForEach(ColorPalette.allStaticMembers) { $color in
     RoundedRectangle(cornerRadius: 12)
-        .fill($color.value)
-        .overlay(Text($color.title))
+        .fill(color.value)
+        .overlay(Text(color.title))
         .tag($color.id)
 }
 ```
@@ -84,5 +84,3 @@ enum BeverageFixtures {
     static let still = Beverage(name: "Still")
 }
 ```
-
-Make sure the static members are declared so they can be assigned to the requested `ofType:` (e.g. annotate them as `Beverage` or `any Protocol`) so the synthesized key paths type-check.
