@@ -37,8 +37,8 @@ public struct StaticMember<Container, Value>: Identifiable {
 
 extension StaticMember: @unchecked Sendable where Value: Sendable {}
 
-private extension String {
-	func memberIdentifierTitle() -> String {
+extension String {
+	fileprivate func memberIdentifierTitle() -> String {
 		let words = memberIdentifierWords()
 		guard !words.isEmpty else { return self }
 		return words
@@ -54,7 +54,7 @@ private extension String {
 			.joined(separator: " ")
 	}
 
-	func memberIdentifierWords() -> [String] {
+	private func memberIdentifierWords() -> [String] {
 		guard !isEmpty else { return [] }
 
 		var words: [String] = []
@@ -93,28 +93,28 @@ private extension String {
 	}
 }
 
-private extension Character {
-	var isLetter: Bool {
+extension Character {
+	private var isLetter: Bool {
 		unicodeScalars.allSatisfy(CharacterSet.letters.contains)
 	}
 
-	var isUppercaseLetter: Bool {
+	private var isUppercaseLetter: Bool {
 		unicodeScalars.allSatisfy(CharacterSet.uppercaseLetters.contains)
 	}
 
-	var isLowercaseLetter: Bool {
+	private var isLowercaseLetter: Bool {
 		unicodeScalars.allSatisfy(CharacterSet.lowercaseLetters.contains)
 	}
 
-	var isNumber: Bool {
+	private var isNumber: Bool {
 		unicodeScalars.allSatisfy(CharacterSet.decimalDigits.contains)
 	}
 
-	var isWordSeparator: Bool {
+	fileprivate var isWordSeparator: Bool {
 		self == "_" || self == "-" || self == " "
 	}
 
-	func shouldInsertBreak(before previous: Character, next: Character?) -> Bool {
+	fileprivate func shouldInsertBreak(before previous: Character, next: Character?) -> Bool {
 		switch true {
 		case previous.isLowercaseLetter && isUppercaseLetter:
 			true

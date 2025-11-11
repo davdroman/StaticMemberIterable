@@ -87,7 +87,7 @@ extension StaticMemberIterableMacro: ExtensionMacro {
 			"""
 
 		return [
-			extensionDecl.cast(ExtensionDeclSyntax.self)
+			extensionDecl.cast(ExtensionDeclSyntax.self),
 		]
 	}
 }
@@ -386,7 +386,7 @@ extension DeclModifierListSyntax {
 
 extension DeclModifierSyntax {
 	var accessKeywordText: String? {
-		if case .keyword(let keyword) = name.tokenKind {
+		if case let .keyword(keyword) = name.tokenKind {
 			switch keyword {
 			case .public:
 				return "public"
