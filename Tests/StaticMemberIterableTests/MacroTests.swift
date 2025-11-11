@@ -41,8 +41,8 @@ struct StaticMemberIterableTests {
 
 	@StaticMemberIterable(ofType: (any BeverageProtocol).self)
 	enum ExistentialBeverageFixtures {
-		static let espresso = ExistentialBeverage(name: "espresso")
-		static let latte = ExistentialBeverage(name: "latte")
+		static let espresso: any BeverageProtocol = ExistentialBeverage(name: "espresso")
+		static let latte: any BeverageProtocol = ExistentialBeverage(name: "latte")
 	}
 
 	@StaticMemberIterable
@@ -76,94 +76,76 @@ struct StaticMemberIterableTests {
 
 	// Tests
 
-	@Test func coffeeMembers() {
-		#expect(Coffee.allStaticMembers.count == 3)
-		#expect(Coffee.allStaticMembers.map(\.name) == ["sunrise", "moonlight", "stardust"])
-		#expect(Coffee.allStaticMembers.map(\.roastLevel) == [2, 3, 4])
+	@Test func coffeeMembers() throws {
+		let members = Coffee.allStaticMembers
 
-		#expect(Coffee.allStaticMemberNames == ["sunrise", "moonlight", "stardust"])
-		#expect(Coffee.allStaticMemberNames.map(\.title) == ["Sunrise", "Moonlight", "Stardust"])
+		#expect(members.count == 3)
+		#expect(members.map(\.name) == ["sunrise", "moonlight", "stardust"])
+		#expect(members.map(\.title) == ["Sunrise", "Moonlight", "Stardust"])
+		#expect(members.map(\.value.name) == ["sunrise", "moonlight", "stardust"])
+		#expect(members.map(\.value.roastLevel) == [2, 3, 4])
 
-		#expect(Coffee.allNamedStaticMembers.count == 3)
-		#expect(Coffee.allNamedStaticMembers.map(\.name) == ["sunrise", "moonlight", "stardust"])
-		#expect(Coffee.allNamedStaticMembers.map(\.name.title) == ["Sunrise", "Moonlight", "Stardust"])
-		#expect(Coffee.allNamedStaticMembers.map(\.value.name) == ["sunrise", "moonlight", "stardust"])
-		#expect(Coffee.allNamedStaticMembers.map(\.value.roastLevel) == [2, 3, 4])
+		let sunrise = try #require(members.first)
+		#expect(Coffee.self[keyPath: sunrise.keyPath].name == sunrise.value.name)
 	}
 
 	@Test func multiBindingRuntime() {
-		#expect(Menu.allStaticMembers.count == 2)
-		#expect(Menu.allStaticMembers == [Menu.sunrise, Menu.sunset])
+		let members = Menu.allStaticMembers
 
-		#expect(Menu.allStaticMemberNames == ["sunrise", "sunset"])
-		#expect(Menu.allStaticMemberNames.map(\.title) == ["Sunrise", "Sunset"])
-
-		#expect(Menu.allNamedStaticMembers.count == 2)
-		#expect(Menu.allNamedStaticMembers.map(\.name) == ["sunrise", "sunset"])
-		#expect(Menu.allNamedStaticMembers.map(\.value) == [Menu.sunrise, Menu.sunset])
+		#expect(members.count == 2)
+		#expect(members.map(\.name) == ["sunrise", "sunset"])
+		#expect(members.map(\.title) == ["Sunrise", "Sunset"])
+		#expect(members.map(\.value) == [Menu.sunrise, Menu.sunset])
 	}
 
 	@Test func customMemberTypeRuntime() {
-		#expect(BeverageFixtures.allStaticMembers == [Beverage(name: "sparkling"), Beverage(name: "still")])
+		let members = BeverageFixtures.allStaticMembers
 
-		#expect(BeverageFixtures.allStaticMemberNames == ["sparkling", "still"])
-		#expect(BeverageFixtures.allNamedStaticMembers.map(\.name) == ["sparkling", "still"])
-		#expect(BeverageFixtures.allNamedStaticMembers.map(\.value) == BeverageFixtures.allStaticMembers)
+		#expect(members.map(\.name) == ["sparkling", "still"])
+		#expect(members.map(\.value) == [Beverage(name: "sparkling"), Beverage(name: "still")])
 	}
 
 	@Test func existentialMemberTypeRuntime() {
-		#expect(ExistentialBeverageFixtures.allStaticMembers.count == 2)
-		#expect(
-			ExistentialBeverageFixtures.allStaticMembers
-				== [
-					ExistentialBeverage(name: "espresso"),
-					ExistentialBeverage(name: "latte"),
-				]
-		)
+		let members = ExistentialBeverageFixtures.allStaticMembers
 
-		#expect(ExistentialBeverageFixtures.allStaticMemberNames == ["espresso", "latte"])
-		#expect(ExistentialBeverageFixtures.allStaticMemberNames.map(\.title) == ["Espresso", "Latte"])
-
-		#expect(ExistentialBeverageFixtures.allNamedStaticMembers.map(\.name) == ["espresso", "latte"])
-		#expect(
-			ExistentialBeverageFixtures.allNamedStaticMembers.map(\.value.name)
-				== ExistentialBeverageFixtures.allStaticMembers.map(\.name)
-		)
+		#expect(members.count == 2)
+		#expect(members.map(\.name) == ["espresso", "latte"])
+		#expect(members.map(\.title) == ["Espresso", "Latte"])
+		#expect(members.map(\.value.name) == members.map(\.name))
 	}
 
 	@Test func reservedIdentifiers() {
-		#expect(ReservedNames.allStaticMembers.count == 2)
-		#expect(ReservedNames.allStaticMembers == [ReservedNames.`class`, ReservedNames.plain])
+		let members = ReservedNames.allStaticMembers
 
-		#expect(ReservedNames.allStaticMemberNames == ["class", "plain"])
-		#expect(ReservedNames.allStaticMemberNames.map(\.title) == ["Class", "Plain"])
-
-		#expect(ReservedNames.allNamedStaticMembers.count == 2)
-		#expect(ReservedNames.allNamedStaticMembers.map(\.name) == ["class", "plain"])
-		#expect(ReservedNames.allNamedStaticMembers.map(\.value) == [ReservedNames.`class`, ReservedNames.plain])
+		#expect(members.count == 2)
+		#expect(members.map(\.name) == ["class", "plain"])
+		#expect(members.map(\.title) == ["Class", "Plain"])
+		#expect(members.map(\.value) == [ReservedNames.`class`, ReservedNames.plain])
 	}
 
 	@Test func ignoresNonLetMembers() {
-		#expect(Laboratory.allStaticMembers.count == 2)
-		#expect(Laboratory.allStaticMembers == [Laboratory.alpha, Laboratory.beta])
+		let members = Laboratory.allStaticMembers
 
-		#expect(Laboratory.allStaticMemberNames == ["alpha", "beta"])
-		#expect(Laboratory.allStaticMemberNames.map(\.title) == ["Alpha", "Beta"])
-
-		#expect(Laboratory.allNamedStaticMembers.count == 2)
-		#expect(Laboratory.allNamedStaticMembers.map(\.name) == ["alpha", "beta"])
-		#expect(Laboratory.allNamedStaticMembers.map(\.value) == [Laboratory.alpha, Laboratory.beta])
+		#expect(members.count == 2)
+		#expect(members.map(\.name) == ["alpha", "beta"])
+		#expect(members.map(\.title) == ["Alpha", "Beta"])
+		#expect(members.map(\.value) == [Laboratory.alpha, Laboratory.beta])
 	}
 
 	@Test func classInheritanceRuntime() {
-		#expect(MockDrink.allStaticMembers.count == 2)
-		#expect(MockDrink.allStaticMembers == [MockDrink.water, MockDrink.soda])
+		let members = MockDrink.allStaticMembers
 
-		#expect(MockDrink.allStaticMemberNames == ["water", "soda"])
-		#expect(MockDrink.allStaticMemberNames.map(\.title) == ["Water", "Soda"])
+		#expect(members.count == 2)
+		#expect(members.map(\.name) == ["water", "soda"])
+		#expect(members.map(\.title) == ["Water", "Soda"])
+		#expect(members.map(\.value) == [MockDrink.water, MockDrink.soda])
+	}
 
-		#expect(MockDrink.allNamedStaticMembers.count == 2)
-		#expect(MockDrink.allNamedStaticMembers.map(\.name) == ["water", "soda"])
-		#expect(MockDrink.allNamedStaticMembers.map(\.value) == [MockDrink.water, MockDrink.soda])
+	@Test func staticMemberIterableConformance() {
+		let coffeeMembers: [StaticMemberOf<Coffee>] = Coffee.allStaticMembers
+		let beverageMembers: [StaticMemberOf<BeverageFixtures>] = BeverageFixtures.allStaticMembers
+
+		#expect(coffeeMembers.count == 3)
+		#expect(beverageMembers.map(\.value.name) == ["sparkling", "still"])
 	}
 }

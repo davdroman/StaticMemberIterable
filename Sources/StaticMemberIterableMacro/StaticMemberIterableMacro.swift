@@ -1,3 +1,4 @@
+import Foundation
 import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
@@ -30,7 +31,9 @@ struct StaticMemberIterableMacro: MemberMacro {
 
 		let emitter = StaticMemberEmitter(
 			access: AccessSpecifier(keyword: options.accessModifier),
+			typeAccess: AccessSpecifier(keyword: declaration.explicitAccessModifier),
 			members: members,
+			containerType: declaration.memberContainerType,
 			valueType: options.memberType ?? declaration.memberValueType
 		)
 
@@ -46,6 +49,46 @@ struct StaticMemberIterableMacro: MemberMacro {
 		}
 
 		return emitter.makeDeclarations()
+	}
+}
+
+extension StaticMemberIterableMacro: ExtensionMacro {
+	static func expansion(
+		of node: AttributeSyntax,
+		attachedTo declaration: some DeclGroupSyntax,
+		providingExtensionsOf type: some TypeSyntaxProtocol,
+		conformingTo protocols: [TypeSyntax],
+		in context: some MacroExpansionContext
+	) throws -> [ExtensionDeclSyntax] {
+		if protocols.isEmpty {
+			return []
+		}
+
+		guard declaration.isSupportedType else {
+			throw DiagnosticsError(
+				diagnostics: [
+					Diagnostic(node: Syntax(node), message: NotATypeError()),
+				]
+			)
+		}
+
+		let wantsStaticMemberIterable = protocols.contains {
+			$0.trimmedDescription == "StaticMemberIterable"
+		}
+
+		guard wantsStaticMemberIterable else {
+			return []
+		}
+
+		let extendedType = type.trimmedDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+		let extensionDecl: DeclSyntax =
+			"""
+			extension \(raw: extendedType): StaticMemberIterable {}
+			"""
+
+		return [
+			extensionDecl.cast(ExtensionDeclSyntax.self),
+		]
 	}
 }
 
@@ -93,28 +136,37 @@ struct ConflictingMemberError: DiagnosticMessage {
 
 struct StaticMemberEmitter {
 	let access: AccessSpecifier
-	let members: [StaticMember]
+	let typeAccess: AccessSpecifier
+	let members: [StaticMemberInfo]
+	let containerType: String
 	let valueType: String
 
 	static let synthesizedMemberNames = [
+		"StaticMemberValue",
 		"allStaticMembers",
-		"allStaticMemberNames",
-		"allNamedStaticMembers",
 	]
 
 	func makeDeclarations() -> [DeclSyntax] {
-		let identifiers = members.map(\.reference).joined(separator: ", ")
-		let names = members.map(\.literal).joined(separator: ", ")
-		let tuples = members.map(\.tuple).joined(separator: ",\n")
+		let sanitizedContainerType = containerType.trimmingCharacters(in: .whitespacesAndNewlines)
+		let entries = members
+			.map { $0.initializer(containerType: sanitizedContainerType) }
+			.joined(separator: ",\n")
+
+		let typealiasDecl: DeclSyntax =
+			"""
+			\(raw: typeAccess.prefix)typealias StaticMemberValue = \(raw: valueType)
+			"""
+
+		let membersDecl: DeclSyntax =
+			"""
+			\(raw: access.prefix)static let allStaticMembers: [StaticMember<\(raw: containerType), \(raw: valueType)>] = [
+			\(raw: entries)
+			]
+			"""
 
 		return [
-			"\(raw: access.prefix)static let allStaticMembers = [\(raw: identifiers)]",
-			"\(raw: access.prefix)static let allStaticMemberNames: [StaticMemberName] = [\(raw: names)]",
-			"""
-			\(raw: access.prefix)static let allNamedStaticMembers: [(name: StaticMemberName, value: \(raw: valueType))] = [
-			\(raw: tuples)
-			]
-			""",
+			typealiasDecl,
+			membersDecl,
 		]
 	}
 }
@@ -127,16 +179,28 @@ struct AccessSpecifier {
 	}
 }
 
-struct StaticMember {
+struct StaticMemberInfo {
 	let reference: String
 	let literal: String
-	let tuple: String
 
 	init(identifier: TokenSyntax) {
-		self.reference = identifier.text
-		let plainName = reference.trimmingBackticks()
+		let identifierText = identifier.text
+			.trimmingCharacters(in: .whitespacesAndNewlines)
+		self.reference = identifierText
+		let plainName = identifierText.trimmingBackticks()
 		self.literal = "\"\(plainName)\""
-		self.tuple = "(name: \(literal), value: \(reference))"
+	}
+
+	func initializer(containerType: String) -> String {
+		let keyPath = "\\\(containerType).Type.\(reference)"
+		return
+			"""
+			StaticMember(
+				keyPath: \(keyPath),
+				name: \(literal),
+				value: \(reference)
+			)
+			"""
 	}
 }
 
@@ -197,7 +261,7 @@ extension DeclGroupSyntax {
 		self.is(StructDeclSyntax.self) || self.is(EnumDeclSyntax.self) || self.is(ClassDeclSyntax.self)
 	}
 
-	var staticMembers: [StaticMember] {
+	var staticMembers: [StaticMemberInfo] {
 		memberBlock.members.flatMap(\.staticMembers)
 	}
 
@@ -205,19 +269,76 @@ extension DeclGroupSyntax {
 		memberBlock.members.contains { $0.declaresVariable(named: name) }
 	}
 
+	var explicitAccessModifier: String? {
+		if let structDecl = self.as(StructDeclSyntax.self) {
+			return structDecl.modifiers.accessModifierKeyword
+		}
+		if let enumDecl = self.as(EnumDeclSyntax.self) {
+			return enumDecl.modifiers.accessModifierKeyword
+		}
+		if let classDecl = self.as(ClassDeclSyntax.self) {
+			return classDecl.modifiers.accessModifierKeyword
+		}
+		return nil
+	}
+
 	var memberValueType: String {
-		if self.is(ClassDeclSyntax.self) {
-			return classValueTypeName ?? "Self"
+		declaredTypeName
+	}
+
+	var memberContainerType: String {
+		declaredTypeName
+	}
+
+	var declaredTypeName: String {
+		if let structDecl = self.as(StructDeclSyntax.self) {
+			return structDecl.declaredTypeName
+		}
+		if let enumDecl = self.as(EnumDeclSyntax.self) {
+			return enumDecl.declaredTypeName
+		}
+		if let classDecl = self.as(ClassDeclSyntax.self) {
+			return classDecl.declaredTypeName
 		}
 		return "Self"
 	}
+}
 
-	var classValueTypeName: String? {
-		guard let classDecl = self.as(ClassDeclSyntax.self) else { return nil }
+extension StructDeclSyntax {
+	var declaredTypeName: String {
+		var name = self.name.text
 
-		var name = classDecl.name.text
+		if let generics = genericParameterClause, !generics.parameters.isEmpty {
+			let parameters = generics.parameters
+				.map(\.name.text)
+				.joined(separator: ", ")
+			name += "<\(parameters)>"
+		}
 
-		if let generics = classDecl.genericParameterClause {
+		return name
+	}
+}
+
+extension EnumDeclSyntax {
+	var declaredTypeName: String {
+		var name = self.name.text
+
+		if let generics = genericParameterClause, !generics.parameters.isEmpty {
+			let parameters = generics.parameters
+				.map(\.name.text)
+				.joined(separator: ", ")
+			name += "<\(parameters)>"
+		}
+
+		return name
+	}
+}
+
+extension ClassDeclSyntax {
+	var declaredTypeName: String {
+		var name = self.name.text
+
+		if let generics = genericParameterClause, !generics.parameters.isEmpty {
 			let parameters = generics.parameters
 				.map(\.name.text)
 				.joined(separator: ", ")
@@ -229,7 +350,7 @@ extension DeclGroupSyntax {
 }
 
 extension MemberBlockItemSyntax {
-	var staticMembers: [StaticMember] {
+	var staticMembers: [StaticMemberInfo] {
 		guard
 			let variable = decl.as(VariableDeclSyntax.self),
 			variable.isStaticLet
@@ -240,7 +361,7 @@ extension MemberBlockItemSyntax {
 		return variable.bindings.compactMap {
 			$0.pattern.as(IdentifierPatternSyntax.self)?.identifier
 		}
-		.map(StaticMember.init(identifier:))
+		.map(StaticMemberInfo.init(identifier:))
 	}
 
 	func declaresVariable(named name: String) -> Bool {
@@ -249,6 +370,41 @@ extension MemberBlockItemSyntax {
 		}
 
 		return variable.declaredNames.contains(name)
+	}
+}
+
+extension DeclModifierListSyntax {
+	var accessModifierKeyword: String? {
+		for modifier in self {
+			if let keyword = modifier.accessKeywordText {
+				return keyword
+			}
+		}
+		return nil
+	}
+}
+
+extension DeclModifierSyntax {
+	var accessKeywordText: String? {
+		if case let .keyword(keyword) = name.tokenKind {
+			switch keyword {
+			case .public:
+				return "public"
+			case .package:
+				return "package"
+			case .internal:
+				return "internal"
+			case .fileprivate:
+				return "fileprivate"
+			case .private:
+				return "private"
+			case .open:
+				return "public"
+			default:
+				return nil
+			}
+		}
+		return nil
 	}
 }
 

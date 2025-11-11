@@ -20,25 +20,41 @@ Add the dependency and product to your `Package.swift`:
 
 ```swift
 import StaticMemberIterable
+import SwiftUI
 
 @StaticMemberIterable
-struct Coffee {
-    let name: String
-    let roastLevel: Int
-
-    static let sunrise = Coffee(name: "sunrise", roastLevel: 2)
-    static let moonlight = Coffee(name: "moonlight", roastLevel: 3)
-    static let stardust = Coffee(name: "stardust", roastLevel: 4)
+enum ColorPalette {
+    static let sunrise: Color = Color(red: 1.00, green: 0.58, blue: 0.22)
+    static let moonlight: Color = Color(red: 0.30, green: 0.32, blue: 0.60)
+    static let stardust: Color = Color(red: 0.68, green: 0.51, blue: 0.78)
 }
 
-Coffee.allStaticMembers       // [sunrise, moonlight, stardust]
-Coffee.allStaticMemberNames   // ["sunrise", "moonlight", "stardust"] as [StaticMemberName]
-Coffee.allNamedStaticMembers  // [(name: "sunrise", value: sunrise), ...] as [(name: StaticMemberName, value: Coffee)]
-
-Coffee.allStaticMemberNames.map(\.title) // ["Sunrise", "Moonlight", "Stardust"]
+ColorPalette.allStaticMembers.map(\.value)   // [.orange, .indigo, .purple] as [Color]
+ColorPalette.allStaticMembers.map(\.title)   // ["Sunrise", "Moonlight", "Stardust"]
+ColorPalette.allStaticMembers.map(\.keyPath) // [\ColorPalette.sunrise, ...] as [KeyPath<ColorPalette.Type, Color>]
 ```
 
 The macro works the same for enums and classes (actors are intentionally unsupported so far).
+
+Each synthesized entry is a `StaticMember<Container, Value>`: an `Identifiable` property wrapper that stores the friendly name, the `KeyPath` to the static property, and the concrete value. This makes it trivial to drive UI:
+
+```swift
+ForEach(ColorPalette.allStaticMembers) { $color in
+    RoundedRectangle(cornerRadius: 12)
+        .fill(color)
+        .overlay(Text($color.title))
+        .tag($color.id)
+}
+```
+
+`StaticMember` exposes four pieces of data:
+
+- `name: String` – keeps the original identifier for the member.
+- `title: String` – human-friendly representation derived from the identifier.
+- `keyPath: KeyPath<Container.Type, Value>` – points back to the static property inside the declaring type.
+- `value`/`wrappedValue: Value` – the actual static instance.
+
+Because it is a property wrapper, you can also project (`$member`) when you use it on your own properties, and `Identifiable` conformance makes it slot neatly into `ForEach`.
 
 ### Access control
 
