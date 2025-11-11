@@ -50,11 +50,11 @@ Each synthesized entry is a `StaticMember<Container, Value>`: an `Identifiable` 
 
 ```swift
 ForEach(ColorPalette.allStaticMembers) { $color in
-    let color = $color.value
-    RoundedRectangle(cornerRadius: 12)
-        .fill(color)
-        .overlay(Text($color.title))
-        .tag($color.id)
+    Text($color.title)
+        .padding()
+        .background {
+            RoundedRectangle(cornerRadius: 8).fill(color)
+        }
 }
 ```
 
