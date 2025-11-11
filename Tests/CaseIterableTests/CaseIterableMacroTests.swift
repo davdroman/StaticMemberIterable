@@ -246,37 +246,27 @@ struct CaseIterableMacroTests {
 		}
 	}
 
-	@Test(arguments: [
-		("public struct Properties {}", "public "),
-		("internal struct Properties {}", "internal "),
-		("struct Properties {}", ""),
-		("package struct Properties {}", "package "),
-		("fileprivate struct Properties {}", "fileprivate "),
-		("private struct Properties {}", "private "),
-	])
-	func dynamicMemberSubscriptMatchesPropertiesAccess(
-		propertiesDeclaration: String,
-		subscriptModifier: String
-	) {
+	@Test(arguments: ["public ", "internal ", "", "package ", "fileprivate ", "private "])
+	func dynamicMemberSubscriptMatchesPropertiesAccess(accessLevel: String) {
 		assertMacro {
-			#"""
+			"""
 			@dynamicMemberLookup
 			@CaseIterable
 			enum Palette {
 				case sunrise
 
-				\#(propertiesDeclaration)
+				\(accessLevel)struct Properties {}
 
 				var properties: Properties { Properties() }
 			}
-			"""#
+			"""
 		} expansion: {
-			#"""
+			"""
 			@dynamicMemberLookup
 			enum Palette {
 				case sunrise
 
-				\#(propertiesDeclaration)
+				\(accessLevel)struct Properties {}
 
 				var properties: Properties { Properties() }
 
@@ -287,11 +277,11 @@ struct CaseIterableMacroTests {
 					)
 				]
 
-				\#(subscriptModifier)subscript <T>(dynamicMember keyPath: KeyPath<Properties, T>) -> T {
+				\(accessLevel)subscript <T>(dynamicMember keyPath: KeyPath<Properties, T>) -> T {
 					properties[keyPath: keyPath]
 				}
 			}
-			"""#
+			"""
 		}
 	}
 
