@@ -9,8 +9,8 @@ import Testing
 	.macros(
 		[CaseIterableMacro.self],
 		indentationWidth: .tab,
-		record: .missing
-	)
+		record: .missing,
+	),
 )
 struct CaseIterableMacroTests {
 	@Test func defaultAccessInternal() {

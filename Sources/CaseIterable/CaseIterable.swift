@@ -3,10 +3,10 @@
 	names: named(allCases), named(subscript(dynamicMember:))
 )
 public macro CaseIterable(
-	_ access: CaseIterableAccess? = nil
+	_ access: CaseIterableAccess? = nil,
 ) = #externalMacro(
 	module: "CaseIterableMacro",
-	type: "CaseIterableMacro"
+	type: "CaseIterableMacro",
 )
 
 public enum CaseIterableAccess {

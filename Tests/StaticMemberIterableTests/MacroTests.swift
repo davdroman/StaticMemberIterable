@@ -148,5 +148,4 @@ struct StaticMemberIterableTests {
 		#expect(coffeeMembers.count == 3)
 		#expect(beverageMembers.map(\.value.name) == ["sparkling", "still"])
 	}
-
 }

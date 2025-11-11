@@ -8,7 +8,7 @@ struct CaseIterableMacro: MemberMacro {
 		of attribute: AttributeSyntax,
 		providingMembersOf declaration: some DeclGroupSyntax,
 		conformingTo protocols: [TypeSyntax],
-		in context: some MacroExpansionContext
+		in context: some MacroExpansionContext,
 	) throws -> [DeclSyntax] {
 		let options = AttributeOptions(attribute: attribute)
 
@@ -16,7 +16,7 @@ struct CaseIterableMacro: MemberMacro {
 			throw DiagnosticsError(
 				diagnostics: [
 					Diagnostic(node: Syntax(attribute), message: NotAnEnumError()),
-				]
+				],
 			)
 		}
 
@@ -30,9 +30,9 @@ struct CaseIterableMacro: MemberMacro {
 				diagnostics: conflictingMembers.map {
 					Diagnostic(
 						node: Syntax(attribute),
-						message: ConflictingMemberError(memberName: $0)
+						message: ConflictingMemberError(memberName: $0),
 					)
-				}
+				},
 			)
 		}
 
@@ -44,9 +44,9 @@ struct CaseIterableMacro: MemberMacro {
 				diagnostics: unsupportedCases.map {
 					Diagnostic(
 						node: Syntax($0),
-						message: AssociatedValueCaseError(caseName: $0.name.text.trimmingBackticks())
+						message: AssociatedValueCaseError(caseName: $0.name.text.trimmingBackticks()),
 					)
-				}
+				},
 			)
 		}
 
@@ -54,8 +54,8 @@ struct CaseIterableMacro: MemberMacro {
 			context.diagnose(
 				Diagnostic(
 					node: Syntax(attribute),
-					message: NoEnumCasesWarning()
-				)
+					message: NoEnumCasesWarning(),
+				),
 			)
 			return []
 		}
@@ -66,7 +66,7 @@ struct CaseIterableMacro: MemberMacro {
 			access: access,
 			containerType: enumDecl.declaredTypeName,
 			cases: caseElements.map(EnumCaseInfo.init),
-			dynamicMemberAccess: hasDynamicMemberLookup ? enumDecl.propertiesStructAccessSpecifier : nil
+			dynamicMemberAccess: hasDynamicMemberLookup ? enumDecl.propertiesStructAccessSpecifier : nil,
 		)
 
 		return emitter.makeDeclarations()
@@ -255,7 +255,7 @@ extension EnumDeclSyntax {
 	private var propertiesStruct: StructDeclSyntax? {
 		for member in memberBlock.members {
 			if let structDecl = member.decl.as(StructDeclSyntax.self),
-				structDecl.name.text.trimmingBackticks() == "Properties"
+			   structDecl.name.text.trimmingBackticks() == "Properties"
 			{
 				return structDecl
 			}
