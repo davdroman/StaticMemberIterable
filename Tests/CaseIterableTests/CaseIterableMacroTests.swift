@@ -8,7 +8,8 @@ import Testing
 @Suite(
 	.macros(
 		[CaseIterableMacro.self],
-		indentationWidth: .tab
+		indentationWidth: .tab,
+		record: .missing
 	)
 )
 struct CaseIterableMacroTests {
